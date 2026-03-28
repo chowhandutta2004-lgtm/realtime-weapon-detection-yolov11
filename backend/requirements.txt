@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+python-multipart
+pydantic-settings
+ultralytics>=8.3.0
+opencv-python
+onnx
+numpy
+Pillow
+aiofiles
+imageio-ffmpeg
