@@ -2,11 +2,7 @@
 
 Real-time weapon detection system powered by **YOLOv11s**. Detects **handguns, long guns, knives, and explosives** through live webcam, CCTV/IP camera streams, or uploaded images and videos.
 
-<p align="center">
-  <img src="demo/demo-preview.gif" alt="ShieldAI Demo Preview" width="800">
-</p>
-
-> **Full demo video:** [Watch the complete 1-minute detection demo](https://github.com/chowhandutta2004-lgtm/realtime-weapon-detection-yolov11/blob/main/demo/weapon-detection-demo.mp4)
+https://github.com/user-attachments/assets/d9b31213-03f1-489d-b9d5-cb3bcda0e524
 
 ## Live Demo
 
