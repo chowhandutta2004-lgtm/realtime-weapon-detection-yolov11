@@ -1,14 +1,3 @@
----
-title: ShieldAI - Real-time Weapon Detection
-emoji: 🛡️
-colorFrom: gray
-colorTo: cyan
-sdk: docker
-app_port: 7860
-pinned: true
-license: mit
----
-
 # ShieldAI — Real-time Weapon Detection using YOLOv11
 
 Real-time weapon detection system powered by **YOLOv11s**. Detects **handguns, long guns, knives, and explosives** through live webcam, CCTV/IP camera streams, or uploaded images and videos.
