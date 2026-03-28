@@ -65,8 +65,8 @@
             if (!res.ok) throw new Error('Upload failed');
 
             const data = await res.json();
-            // Connect using the server-side file path
-            connectToSource(data.path);
+            // Connect using the server-side upload ID
+            connectToSource(data.id);
         } catch (err) {
             showStatus(`Upload failed: ${err.message}`, 'error');
             connectBtn.disabled = false;

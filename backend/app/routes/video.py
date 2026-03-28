@@ -1,12 +1,13 @@
 import json
 import logging
+import re
 import subprocess
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
 import cv2
-from fastapi import APIRouter, File, Query, UploadFile
+from fastapi import APIRouter, File, HTTPException, Query, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse
 
 from ..alerts import add_alert
@@ -75,6 +76,10 @@ def _fmt_time(seconds: float) -> str:
 def _process_video_generator(input_path: Path, output_path: Path, confidence: float | None, original_filename: str = "video.mp4"):
     """Process video frame by frame, yielding SSE progress events."""
     cap = cv2.VideoCapture(str(input_path))
+    if not cap.isOpened():
+        input_path.unlink(missing_ok=True)
+        yield f"data: {json.dumps({'type': 'error', 'message': 'Invalid or corrupted video file'})}\n\n"
+        return
     fps = cap.get(cv2.CAP_PROP_FPS) or 25.0
     w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -220,6 +225,9 @@ async def detect_video(
             f.write(chunk)
 
     cap = cv2.VideoCapture(str(input_path))
+    if not cap.isOpened():
+        input_path.unlink(missing_ok=True)
+        raise HTTPException(400, "Invalid or corrupted video file")
     fps = cap.get(cv2.CAP_PROP_FPS) or 25.0
     w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -295,11 +303,16 @@ async def detect_video(
     )
 
 
+def _validate_video_id(video_id: str):
+    if not re.match(r'^[a-f0-9\-]{36}$', video_id):
+        raise HTTPException(400, "Invalid video ID")
+
+
 @router.get("/video/result/{video_id}")
 async def get_result_video(video_id: str):
+    _validate_video_id(video_id)
     path = Path(settings.RESULTS_DIR) / f"{video_id}_result.mp4"
     if not path.exists():
-        from fastapi import HTTPException
         raise HTTPException(404, "Video not found")
     return FileResponse(str(path), media_type="video/mp4")
 
@@ -340,12 +353,12 @@ async def video_history():
 @router.delete("/video/history/{video_id}")
 async def delete_video(video_id: str):
     """Delete a processed video and its metadata."""
+    _validate_video_id(video_id)
     results_dir = Path(settings.RESULTS_DIR)
     video_path = results_dir / f"{video_id}_result.mp4"
     meta_path = results_dir / f"{video_id}_meta.json"
 
     if not video_path.exists():
-        from fastapi import HTTPException
         raise HTTPException(404, "Video not found")
 
     video_path.unlink(missing_ok=True)

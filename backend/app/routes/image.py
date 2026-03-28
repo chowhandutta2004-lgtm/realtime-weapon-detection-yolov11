@@ -2,7 +2,7 @@ import base64
 
 import cv2
 import numpy as np
-from fastapi import APIRouter, File, Query, UploadFile
+from fastapi import APIRouter, File, HTTPException, Query, UploadFile
 
 from ..alerts import add_alert
 from ..model import detector
@@ -19,6 +19,8 @@ async def detect_image(
     contents = await file.read()
     nparr = np.frombuffer(contents, np.uint8)
     frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    if frame is None:
+        raise HTTPException(400, "Invalid image file")
 
     annotated, detections = detector.detect_frame(frame, confidence, use_tta=True, deep_knife=True)
 

@@ -20,20 +20,25 @@ logger = logging.getLogger(__name__)
 _TEMP_VIDEO_DIR = os.path.join(settings.UPLOAD_DIR, "cctv_temp")
 os.makedirs(_TEMP_VIDEO_DIR, exist_ok=True)
 
+# Map upload IDs to file paths (server-side only)
+_upload_paths: dict[str, str] = {}
+
 
 @router.post("/api/detect/cctv/upload")
 async def upload_cctv_video(file: UploadFile):
-    """Save an uploaded video and return a local path the CCTV WebSocket can open."""
+    """Save an uploaded video and return an ID the CCTV WebSocket can open."""
     ext = os.path.splitext(file.filename or "video.mp4")[1] or ".mp4"
-    filename = f"{uuid.uuid4().hex}{ext}"
+    upload_id = uuid.uuid4().hex
+    filename = f"{upload_id}{ext}"
     filepath = os.path.join(_TEMP_VIDEO_DIR, filename)
 
     with open(filepath, "wb") as f:
         while chunk := await file.read(1024 * 1024):
             f.write(chunk)
 
-    logger.info(f"CCTV video uploaded: {filepath}")
-    return {"path": filepath}
+    _upload_paths[upload_id] = filepath
+    logger.info(f"CCTV video uploaded: {upload_id}")
+    return {"id": upload_id}
 
 ALERT_COOLDOWN_SEC = 10
 
@@ -137,6 +142,10 @@ async def cctv_detect(ws: WebSocket):
                         continue
 
                     await ws.send_text(json.dumps({"status": "connecting"}))
+
+                    # Resolve upload IDs to file paths
+                    if camera_url in _upload_paths:
+                        camera_url = _upload_paths[camera_url]
 
                     # Check if it's a local file path
                     is_file = os.path.isfile(camera_url)

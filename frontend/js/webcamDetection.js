@@ -143,11 +143,11 @@
             };
 
             ws.onerror = () => {
-                alert('WebSocket connection failed. Is the server running?');
+                showToast('WebSocket connection failed. Is the server running?', 'danger');
                 stop();
             };
         } catch (err) {
-            alert(`Camera access denied: ${err.message}`);
+            showToast(`Camera access denied: ${err.message}`, 'danger');
         }
     }
 

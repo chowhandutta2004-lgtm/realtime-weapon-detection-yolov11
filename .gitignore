@@ -28,5 +28,14 @@ desktop.ini
 *.swp
 *.swo
 
+# Scratch / Colab helper scripts
+cell*.py
+colab_*.py
+check_folders.py
+
+# Pretrained base weights (not fine-tuned)
+backend/yolo11s.pt
+backend/yolov8s.pt
+
 # Claude Code
 .claude/
