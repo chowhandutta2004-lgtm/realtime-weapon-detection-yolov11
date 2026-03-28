@@ -32,6 +32,28 @@
 
     const resetSummaryBtn = document.getElementById('resetSummary');
 
+    // Detect if running on HF Spaces (cloud CPU — too slow for real-time)
+    const isCloud = location.hostname.includes('.hf.space') || location.hostname.includes('huggingface.co');
+
+    if (isCloud) {
+        placeholder.innerHTML = `
+            <div class="placeholder-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/></svg>
+            </div>
+            <p style="font-size:1rem;font-weight:700;margin-bottom:8px;">Live Webcam — Local Only</p>
+            <span class="placeholder-hint" style="max-width:420px;display:block;line-height:1.6;">
+                Real-time webcam detection requires a GPU and runs too slow on free cloud CPUs.
+                Clone the repo and run locally for smooth 15+ FPS detection.
+            </span>
+            <a href="https://github.com/chowhandutta2004-lgtm/realtime-weapon-detection-yolov11" target="_blank"
+               style="margin-top:16px;display:inline-block;padding:10px 20px;background:var(--accent);color:var(--bg-base);border-radius:8px;font-weight:700;font-size:0.85rem;text-decoration:none;">
+                View on GitHub
+            </a>
+        `;
+        startBtn.style.display = 'none';
+        return; // Exit — don't attach any event listeners
+    }
+
     startBtn.addEventListener('click', start);
     stopBtn.addEventListener('click', stop);
     resetSummaryBtn.addEventListener('click', () => {

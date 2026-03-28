@@ -18,6 +18,29 @@
     let frameCount = 0;
     let lastFpsTime = performance.now();
 
+    // Detect if running on HF Spaces
+    const isCloud = location.hostname.includes('.hf.space') || location.hostname.includes('huggingface.co');
+
+    if (isCloud) {
+        const connectBar = document.querySelector('.cctv-connect-bar');
+        if (connectBar) connectBar.style.display = 'none';
+        placeholder.innerHTML = `
+            <div class="placeholder-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+            </div>
+            <p style="font-size:1rem;font-weight:700;margin-bottom:8px;">CCTV Streaming — Local Only</p>
+            <span class="placeholder-hint" style="max-width:420px;display:block;line-height:1.6;">
+                CCTV and IP camera streaming requires a local server on your network.
+                Clone the repo and run locally to connect your cameras.
+            </span>
+            <a href="https://github.com/chowhandutta2004-lgtm/realtime-weapon-detection-yolov11" target="_blank"
+               style="margin-top:16px;display:inline-block;padding:10px 20px;background:var(--accent);color:var(--bg-base);border-radius:8px;font-weight:700;font-size:0.85rem;text-decoration:none;">
+                View on GitHub
+            </a>
+        `;
+        return; // Exit — don't attach any event listeners
+    }
+
     connectBtn.addEventListener('click', () => connectWithUrl());
     disconnectBtn.addEventListener('click', disconnect);
 
