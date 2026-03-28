@@ -5,6 +5,7 @@ pydantic-settings
 ultralytics>=8.3.0
 opencv-python
 onnx
+onnxruntime
 numpy
 Pillow
 aiofiles

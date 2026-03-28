@@ -39,7 +39,13 @@ class WeaponDetector:
     def load(self):
         global _knife_class_idx
         model_path = Path(settings.MODEL_PATH)
-        if model_path.exists():
+
+        # Prefer ONNX model on CPU (much faster inference)
+        onnx_path = model_path.with_suffix(".onnx")
+        if onnx_path.exists():
+            logger.info(f"Loading ONNX model from {onnx_path}")
+            self.model = YOLO(str(onnx_path), task="detect")
+        elif model_path.exists():
             logger.info(f"Loading fine-tuned model from {model_path}")
             self.model = YOLO(str(model_path))
         else:
@@ -168,8 +174,13 @@ class WeaponDetector:
         knife_conf = settings.KNIFE_CONFIDENCE_THRESHOLD
         h, w = frame.shape[:2]
 
-        # Use 640 for live (fast), 1280 for deep mode (accurate)
-        imgsz = 1280 if deep_knife else 640
+        # Use 320 for live (fast on CPU), 640 for uploads, 1280 for deep mode
+        if deep_knife:
+            imgsz = 1280
+        elif use_tta:
+            imgsz = 640
+        else:
+            imgsz = 320
 
         # Single pass at the lower knife threshold
         run_conf = min(conf, knife_conf)
