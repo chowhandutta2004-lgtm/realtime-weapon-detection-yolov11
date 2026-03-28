@@ -15,10 +15,6 @@ Real-time weapon detection system powered by **YOLOv11s**. Detects **handguns, l
 
 https://github.com/user-attachments/assets/d9b31213-03f1-489d-b9d5-cb3bcda0e524
 
-## Live Demo
-
-> **[Try ShieldAI Live](https://huggingface.co/spaces/chowhandutta/realtime-weapon-detection-yolov11)** — open the link, point your webcam, and see it in action.
-
 ## Features
 
 - **Live Webcam Detection** — Real-time browser-based weapon detection via WebSocket
